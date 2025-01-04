@@ -13,17 +13,196 @@ enum Role {
   SELLER
 }
 
+enum PaymentStatus {
+  PENDING
+  CANCELLED
+  COMPLETED
+}
+
 model User {
-  id             String    @id @default(cuid())
-  name           String
-  email          String    @unique
-  password       String
-  phone          String?
-  role           Role
-  avatar         String?
-  status         Boolean   @default(true)
-  email_verified DateTime?
-  auth_type      String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  phone         String?
+  role          Role
+  avatar        String?
+  status        Boolean   @default(true)
+  emailVerified DateTime?
+  authType      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  store    Store[]
+  order    Order[]
+  cart     Cart[]
+  Reviews  Reviews[]
+  Wishlist Wishlist[]
+  Log      Log[]
+}
+
+model Store {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  slug        String   @unique
+  description String?
+  logo        String?
+  banner      String?
+  address     String?
+  phone       String?
+  status      Boolean  @default(true)
+  balance     BigInt   @default(0)
+  backInfo    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product     Product[]
+  order       Order[]
+  transaction Transaction[]
+  StoreView   StoreView[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  image     String?
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id])
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  name        String
+  slug        String   @unique
+  description String?
+  price       Int
+  stock       Int
+  weight      Int?
+  status      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  productView ProductView[]
+  orderItem   OrderItem[]
+  Cart        Cart[]
+  Reviews     Reviews[]
+  Wishlist    Wishlist[]
+}
+
+model ProductView {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  storeId         String
+  store           Store         @relation(fields: [storeId], references: [id])
+  invoiceNumber   String        @unique
+  totalAmount     BigInt
+  shippingAddress String
+  shippingCost    BigInt
+  paymentStatus   PaymentStatus
+  paymentMethod   String
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  orderItem   OrderItem[]
+  transaction Transaction[]
+  Reviews     Reviews[]
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     BigInt
+  subTotal  BigInt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id          String        @id @default(cuid())
+  storeId     String
+  store       Store         @relation(fields: [storeId], references: [id])
+  orderId     String
+  order       Order         @relation(fields: [orderId], references: [id])
+  amount      BigInt
+  type        String?
+  status      PaymentStatus
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Reviews {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  rating    Int
+  comment   String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StoreView {
+  id         String   @id @default(cuid())
+  storeId    String
+  store      Store    @relation(fields: [storeId], references: [id])
+  viewsCount Int
+  date       DateTime
+}
+
+model Log {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  date      DateTime
+  createdAt DateTime @default(now())
 }

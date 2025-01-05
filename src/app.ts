@@ -1,10 +1,8 @@
 import express from "express";
 import cors from "cors";
-import "dotenv/config";
 import cookieParser from "cookie-parser";
 import errorHandlerMiddleware from "./middleware/handle-error";
-
-const Port = process.env.PORT;
+import config from "./config";
 
 const app = express();
 
@@ -20,7 +18,7 @@ app.use(cookieParser());
 
 // app.use(errorHandlerMiddleware);
 
-app.listen(Port, () => {
-  console.log(`Server running on localhost:${Port}`);
+app.listen(config.port, () => {
+  console.log(`Server running on localhost:${config.port}`);
 });
 

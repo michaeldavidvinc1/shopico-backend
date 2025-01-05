@@ -25,7 +25,7 @@ model User {
   email         String    @unique
   password      String
   phone         String?
-  role          Role
+  role          Role      @default(CUSTOMER)
   avatar        String?
   status        Boolean   @default(true)
   emailVerified DateTime?

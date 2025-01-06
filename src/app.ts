@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import errorHandlerMiddleware from "./middleware/handle-error";
 import config from "./config";
+import {publicApi} from "./api/router/public-api";
 
 const app = express();
 
@@ -16,7 +17,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// app.use(errorHandlerMiddleware);
+app.use('/api/v1', publicApi);
+
+// @ts-ignore
+app.use(errorHandlerMiddleware);
 
 app.listen(config.port, () => {
   console.log(`Server running on localhost:${config.port}`);

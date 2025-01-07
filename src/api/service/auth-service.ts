@@ -1,7 +1,8 @@
+import { Response } from "express";
 import { prismaClient } from "../../db/prisma";
 import { BadRequest } from "../../errors";
 import {
-  LoginAdminRequest,
+  LoginRequest,
   RegisterRequest,
 } from "../../model/request/auth-request";
 import {
@@ -9,6 +10,8 @@ import {
   toAuthResponse,
 } from "../../model/response/auth-response";
 import { Validation } from "../../model/response/validation";
+import { createTokenUser } from "../../utils/createUserToken";
+import { createJWT } from "../../utils/jwt";
 import { AuthValidation } from "../../validation/auth-validation";
 import { Role } from "@prisma/client";
 import bcrypt from "bcrypt";
@@ -40,7 +43,7 @@ export class AuthService {
     return toAuthResponse(result);
   }
 
-  static async loginAdmin(req: LoginAdminRequest): Promise<AuthResponse> {
+  static async loginAdmin(req: LoginRequest, res: Response): Promise<AuthResponse> {
     const loginAdminRequest = Validation.validate(AuthValidation.LOGIN, req);
 
     let user = await prismaClient.user.findFirst({
@@ -53,7 +56,7 @@ export class AuthService {
       throw new BadRequest("Invalid Credentials!");
     }
 
-    if (user.role === Role.ADMIN) {
+    if (user.role !== Role.ADMIN) {
       throw new BadRequest("Unauthorized!");
     }
 
@@ -65,5 +68,44 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new BadRequest("Username or password is wrong");
     }
+
+    const token = createJWT({ payload: createTokenUser(user), res });
+
+    const response = toAuthResponse(user);
+    return {
+      ...response,
+      token: token,
+    };
+  }
+
+  static async login(req: LoginRequest, res: Response): Promise<AuthResponse> {
+    const loginRequest = Validation.validate(AuthValidation.LOGIN, req);
+
+    let user = await prismaClient.user.findFirst({
+      where: {
+        email: loginRequest.email,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequest("Invalid Credentials!");
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      loginRequest.password,
+      user.password
+    );
+
+    if (!isPasswordValid) {
+      throw new BadRequest("Username or password is wrong");
+    }
+
+    const token = createJWT({ payload: createTokenUser(user), res });
+
+    const response = toAuthResponse(user);
+    return {
+      ...response,
+      token: token,
+    };
   }
 }

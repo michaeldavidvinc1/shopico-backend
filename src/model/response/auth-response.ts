@@ -1,6 +1,7 @@
 import { User } from "@prisma/client";
 
 export type AuthResponse = {
+  id?: string;
   name: string;
   email: string;
   role: string;

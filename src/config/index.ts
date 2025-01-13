@@ -7,6 +7,9 @@ const config = {
   jwtSecret: process.env.JWT_SECRET_KEY,
   jwtExpiration: process.env.JWT_EXPIRATION,
   node_env: process.env.NODE_ENV,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  cloud_api_key: process.env.CLOUDINARY_API_KEY,
+  cloud_api_secret: process.env.CLOUDINARY_API_SECRET,
 };
 
 export default config;

@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import errorHandlerMiddleware from "./middleware/handle-error";
 import config from "./config";
 import {publicApi} from "./api/router/public-api";
+import { privateApi } from "./api/router/private-api";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use('/api/v1', publicApi);
+app.use('/api/v1', privateApi);
 
 // @ts-ignore
 app.use(errorHandlerMiddleware);

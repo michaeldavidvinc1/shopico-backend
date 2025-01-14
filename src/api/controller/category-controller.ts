@@ -3,6 +3,7 @@ import { CategoryService } from "../service/category-service";
 import {
   CreateCategory,
   SearchCategory,
+  UpdateCategory,
 } from "../../model/request/category-request";
 import cloudinary from "../../lib/cloudinary";
 import fs from "fs";
@@ -20,7 +21,6 @@ class CategoryController {
         const result = await cloudinary.uploader.upload(filePath, {
           folder: "Categories",
         });
-        console.log(result);
         fs.unlinkSync(filePath);
         request.image = result.url;
       }
@@ -60,6 +60,33 @@ class CategoryController {
       res.status(200).json({
         success: true,
         message: "Get single category successfully",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async update(req: Request, res: Response, next: NextFunction){
+    try {
+      const request: UpdateCategory = req.body as UpdateCategory;
+      if(req.body.status === "true"){
+        request.status = true
+      }
+      if (req.file) {
+        const filePath = req.file.path;
+        const result = await cloudinary.uploader.upload(filePath, {
+          folder: "Categories",
+        });
+        fs.unlinkSync(filePath);
+        request.image = result.url;
+      } else {
+        request.image = null;
+      }
+      const result = await CategoryService.update(request);
+      res.status(200).json({
+        success: true,
+        message: "Update category successfully",
         data: result,
       });
     } catch (error) {

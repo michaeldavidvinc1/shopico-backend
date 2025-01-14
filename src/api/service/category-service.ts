@@ -3,6 +3,7 @@ import { BadRequest, NotFound } from "../../errors";
 import {
   CreateCategory,
   SearchCategory,
+  UpdateCategory,
 } from "../../model/request/category-request";
 import {
   ApiCategory,
@@ -11,6 +12,8 @@ import {
 import { Validation } from "../../validation/validation";
 import { CategoryValidation } from "../../validation/category-validation";
 import { Pageable } from "../../model/response/page";
+import cloudinary from "../../lib/cloudinary";
+import { ExtractPublicId } from "../../helpers/extractPubliId";
 
 export class CategoryService {
   static async checkCategoryMustExists(
@@ -86,16 +89,47 @@ export class CategoryService {
     };
   }
 
-  static async getSingle(slug: string): Promise<ApiCategory>{
+  static async getSingle(slug: string): Promise<ApiCategory> {
     const category = await prismaClient.category.findFirst({
-        where:{
-            slug: slug
-        }
-    })
+      where: {
+        slug: slug,
+      },
+    });
 
-    if(!category){
-        throw new NotFound("Category not found");
+    if (!category) {
+      throw new NotFound("Category not found");
     }
+
+    return toCategoryResponse(category);
+  }
+
+  static async update(req: UpdateCategory): Promise<ApiCategory> {
+    const updateRequest = Validation.validate(CategoryValidation.UPDATE, req);
+
+    const existingData = await this.checkCategoryMustExists(updateRequest.slug);
+
+    if (updateRequest.image === null) {
+      updateRequest.image = existingData.image;
+    } else {
+      if (existingData.image) {
+        const publicId = ExtractPublicId(existingData.image);
+        console.log(publicId)
+        await cloudinary.uploader.destroy(publicId);
+      }
+    }
+
+
+    const category = await prismaClient.category.update({
+      where: {
+        slug: updateRequest.slug,
+      },
+      data: {
+        name: updateRequest.name,
+        slug: updateRequest.slug,
+        image: updateRequest.image,
+        status: updateRequest.status,
+      },
+    });
 
     return toCategoryResponse(category);
   }

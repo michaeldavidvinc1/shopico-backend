@@ -10,8 +10,6 @@ import {
 } from "../../model/response/category-response";
 import { Validation } from "../../validation/validation";
 import { CategoryValidation } from "../../validation/category-validation";
-import { v2 as cloudinary } from "cloudinary";
-import fs from "fs";
 import { Pageable } from "../../model/response/page";
 
 export class CategoryService {
@@ -86,5 +84,19 @@ export class CategoryService {
         size: searchCategory.size,
       },
     };
+  }
+
+  static async getSingle(slug: string): Promise<ApiCategory>{
+    const category = await prismaClient.category.findFirst({
+        where:{
+            slug: slug
+        }
+    })
+
+    if(!category){
+        throw new NotFound("Category not found");
+    }
+
+    return toCategoryResponse(category);
   }
 }

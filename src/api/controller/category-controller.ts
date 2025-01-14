@@ -52,6 +52,20 @@ class CategoryController {
       next(error);
     }
   }
+
+  static async getSingle(req: Request, res: Response, next: NextFunction){
+    try {
+      const categorySlug = req.params.slug;
+      const result = await CategoryService.getSingle(categorySlug);
+      res.status(200).json({
+        success: true,
+        message: "Get single category successfully",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default CategoryController;

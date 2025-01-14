@@ -3,3 +3,10 @@ export type CreateCategory = {
     slug: string;
     image: string | null;
 }
+
+export type SearchCategory = {
+    name: string;
+    status: boolean;
+    page: number;
+    size: number;
+  };

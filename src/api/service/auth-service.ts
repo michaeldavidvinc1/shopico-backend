@@ -9,7 +9,7 @@ import {
   AuthResponse,
   toAuthResponse,
 } from "../../model/response/auth-response";
-import { Validation } from "../../model/response/validation";
+import { Validation } from "../../validation/validation";
 import { createTokenUser } from "../../utils/createUserToken";
 import { createJWT } from "../../utils/jwt";
 import { AuthValidation } from "../../validation/auth-validation";

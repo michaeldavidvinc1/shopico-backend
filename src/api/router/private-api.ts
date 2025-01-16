@@ -1,10 +1,14 @@
 import express from "express";
 import upload from "../../lib/multer";
 import CategoryController from "../controller/category-controller";
+import { authenticate, checkRole } from "../../middleware/auth";
 
 export const privateApi = express.Router();
 
-privateApi.post("/admin/category/create", upload.single('image'), CategoryController.create);
-privateApi.get("/admin/category",  CategoryController.getAll);
-privateApi.get("/admin/category/:slug",  CategoryController.getSingle);
-privateApi.put("/admin/category/:slug", upload.single('image'), CategoryController.update);
+privateApi.post("/admin/category/create", authenticate, checkRole('ADMIN'), upload.single('image'), CategoryController.create);
+privateApi.get("/admin/category", authenticate, checkRole('ADMIN') ,CategoryController.getAll);
+privateApi.get("/admin/category/:slug", authenticate, checkRole('ADMIN'),  CategoryController.getSingle);
+privateApi.put("/admin/category/:slug", authenticate, checkRole('ADMIN'), upload.single('image'), CategoryController.update);
+privateApi.get("/admin/category/:slug/softDelete", authenticate, checkRole('ADMIN'),  CategoryController.softDelete);
+privateApi.get("/admin/category/:slug/forceDelete", authenticate, checkRole('ADMIN'),  CategoryController.forceDelete);
+privateApi.get("/admin/category/:slug/activated", authenticate, checkRole('ADMIN'),  CategoryController.activatedCategory);

@@ -37,7 +37,7 @@ export class CategoryService {
 
     const duplicateData = await prismaClient.category.findFirst({
       where: {
-        name: createCategory.name,
+        slug: createCategory.slug,
       },
     });
 
@@ -64,9 +64,13 @@ export class CategoryService {
         contains: searchCategory.name,
       };
     }
-    if (searchCategory.status) {
+    if (searchCategory.status !== undefined) {
       filters.status = {
-        contains: searchCategory.status,
+        equals: searchCategory.status, // Gunakan `equals` untuk Boolean
+      };
+    } else {
+      filters.status = {
+        equals: true, // Default ke true
       };
     }
     const category = await prismaClient.category.findMany({
@@ -103,10 +107,10 @@ export class CategoryService {
     return toCategoryResponse(category);
   }
 
-  static async update(req: UpdateCategory): Promise<ApiCategory> {
+  static async update(req: UpdateCategory, categorySlug: string): Promise<ApiCategory> {
     const updateRequest = Validation.validate(CategoryValidation.UPDATE, req);
 
-    const existingData = await this.checkCategoryMustExists(updateRequest.slug);
+    const existingData = await this.checkCategoryMustExists(categorySlug);
 
     if (updateRequest.image === null) {
       updateRequest.image = existingData.image;
@@ -121,7 +125,7 @@ export class CategoryService {
 
     const category = await prismaClient.category.update({
       where: {
-        slug: updateRequest.slug,
+        slug: categorySlug,
       },
       data: {
         name: updateRequest.name,
@@ -133,4 +137,50 @@ export class CategoryService {
 
     return toCategoryResponse(category);
   }
+
+  static async softDelete(slug: string): Promise<ApiCategory>{
+    
+    await this.checkCategoryMustExists(slug);
+
+    const category = await prismaClient.category.update({
+      where: {
+        slug: slug
+      },
+      data: {
+        status: false
+      }
+    })
+
+    return category;
+  }
+
+  static async forceDelete(slug: string): Promise<ApiCategory>{
+    
+    await this.checkCategoryMustExists(slug);
+
+    const category = await prismaClient.category.delete({
+      where: {
+        slug: slug
+      }
+    })
+
+    return category;
+  }
+
+  static async activatedCategory(slug: string): Promise<ApiCategory>{
+    
+    await this.checkCategoryMustExists(slug);
+
+    const category = await prismaClient.category.update({
+      where: {
+        slug: slug
+      },
+      data: {
+        status: true
+      }
+    })
+
+    return category;
+  }
+
 }

@@ -38,10 +38,11 @@ class CategoryController {
     try {
       const request: SearchCategory = {
         name: (req.query.name as string) || "",
-        status: req.query.status ? req.query.status === "true" : false,
+        status: req.query.status ? req.query.status === 'true' : true,
         page: req.query.page ? Number(req.query.page) : 1,
         size: req.query.size ? Number(req.query.size) : 10,
       };
+      console.log("request +++ ", request)
       const result = await CategoryService.getAll(request);
       res.status(200).json({
         success: true,
@@ -69,6 +70,7 @@ class CategoryController {
 
   static async update(req: Request, res: Response, next: NextFunction){
     try {
+      const categorySlug = req.params.slug;
       const request: UpdateCategory = req.body as UpdateCategory;
       if(req.body.status === "true"){
         request.status = true
@@ -83,10 +85,52 @@ class CategoryController {
       } else {
         request.image = null;
       }
-      const result = await CategoryService.update(request);
+      const result = await CategoryService.update(request, categorySlug);
       res.status(200).json({
         success: true,
         message: "Update category successfully",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async softDelete(req: Request, res: Response, next: NextFunction){
+    try {
+      const categorySlug = req.params.slug;
+      const result = await CategoryService.softDelete(categorySlug);
+      res.status(200).json({
+        success: true,
+        message: "Delete category successfully",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async forceDelete(req: Request, res: Response, next: NextFunction){
+    try {
+      const categorySlug = req.params.slug;
+      const result = await CategoryService.forceDelete(categorySlug);
+      res.status(200).json({
+        success: true,
+        message: "Delete permanent category successfully",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async activatedCategory(req: Request, res: Response, next: NextFunction){
+    try {
+      const categorySlug = req.params.slug;
+      const result = await CategoryService.activatedCategory(categorySlug);
+      res.status(200).json({
+        success: true,
+        message: "Activated category successfully",
         data: result,
       });
     } catch (error) {

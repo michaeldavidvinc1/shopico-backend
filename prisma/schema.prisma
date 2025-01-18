@@ -54,7 +54,7 @@ model Store {
   phone       String?
   status      Boolean  @default(true)
   balance     BigInt   @default(0)
-  backInfo    Json?
+  bankInfo    Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -88,7 +88,7 @@ model Product {
   price       Int
   stock       Int
   weight      Int?
-  status      Boolean  @default(true)
+  status      Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

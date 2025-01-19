@@ -45,7 +45,7 @@ model Store {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-  name        String
+  name        String 
   slug        String   @unique
   description String?
   logo        String?
@@ -54,7 +54,7 @@ model Store {
   phone       String?
   status      Boolean  @default(true)
   balance     BigInt   @default(0)
-  bankInfo    Json?
+  bankInfo    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

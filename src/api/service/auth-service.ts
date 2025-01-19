@@ -109,4 +109,18 @@ export class AuthService {
       id: user.id
     };
   }
+
+  static async checkUserExists(id: string): Promise<AuthResponse>{
+    const user = await prismaClient.user.findFirst({
+      where: {
+        id: id
+      }
+    });
+
+    if(!user){
+      throw new BadRequest('User not found');
+    }
+
+    return user;
+  }
 }

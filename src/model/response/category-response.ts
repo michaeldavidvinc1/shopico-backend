@@ -1,10 +1,10 @@
 import { Category } from "@prisma/client";
+import {ApiImage} from "./image-response";
 
 export type ApiCategory = {
     id: string;
     name: string;
     slug: string;
-    image: string | null;
     status: boolean;
 }
 
@@ -13,7 +13,6 @@ export function toCategoryResponse(category: Category): ApiCategory {
         id: category.id,
         name: category.name,
         slug: category.slug,
-        image: category.image,
         status: category.status,
     };
   }

@@ -39,13 +39,15 @@ model User {
   Reviews  Reviews[]
   Wishlist Wishlist[]
   Log      Log[]
+
+  @@index([role, status])
 }
 
 model Store {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-  name        String 
+  name        String
   slug        String   @unique
   description String?
   logo        String?
@@ -62,13 +64,15 @@ model Store {
   order       Order[]
   transaction Transaction[]
   StoreView   StoreView[]
+
+  @@index([userId, status])
 }
 
 model Category {
   id        String   @id @default(cuid())
   name      String
   slug      String   @unique
-  image     String?
+  image     Image?
   status    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -85,8 +89,9 @@ model Product {
   name        String
   slug        String   @unique
   description String?
-  price       Int
   stock       Int
+  image       Image[]
+  price       Int
   weight      Int?
   status      Boolean  @default(false)
   createdAt   DateTime @default(now())
@@ -97,6 +102,8 @@ model Product {
   Cart        Cart[]
   Reviews     Reviews[]
   Wishlist    Wishlist[]
+
+  @@index([storeId, categoryId, status])
 }
 
 model ProductView {
@@ -125,6 +132,8 @@ model Order {
   orderItem   OrderItem[]
   transaction Transaction[]
   Reviews     Reviews[]
+
+  @@index([userId, storeId, paymentStatus])
 }
 
 model OrderItem {
@@ -149,6 +158,8 @@ model Cart {
   quantity  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId, productId])
 }
 
 model Transaction {
@@ -163,6 +174,8 @@ model Transaction {
   description String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+
+  @@index([storeId, status])
 }
 
 model Reviews {
@@ -175,9 +188,11 @@ model Reviews {
   order     Order    @relation(fields: [orderId], references: [id])
   rating    Int
   comment   String?
-  image     String?
+  image     Image[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([productId, userId, rating])
 }
 
 model Wishlist {
@@ -196,6 +211,23 @@ model StoreView {
   store      Store    @relation(fields: [storeId], references: [id])
   viewsCount Int
   date       DateTime
+}
+
+model Image {
+  id         String   @id @default(cuid())
+  url        String
+  type       String
+  productId  String?
+  categoryId String?  @unique
+  reviewId   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  category Category? @relation(fields: [categoryId], references: [id])
+  product  Product?  @relation(fields: [productId], references: [id])
+  review   Reviews?  @relation(fields: [reviewId], references: [id])
+
+  @@index([type])
 }
 
 model Log {

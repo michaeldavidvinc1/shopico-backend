@@ -29,13 +29,11 @@ export class StoreService {
           });
       
           if (duplicateData) {
-            throw new BadRequest("Store name already exists");
+              throw new BadRequest("Store name already exists");
           }
-      
           const store = await prismaClient.store.create({
             data: createStore,
           });
-      
           return toStoreResponse(store);
     }
 }

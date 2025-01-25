@@ -224,8 +224,8 @@ model Image {
   updatedAt  DateTime @updatedAt
 
   category Category? @relation(fields: [categoryId], references: [id])
-  product  Product?  @relation(fields: [productId], references: [id])
-  review   Reviews?  @relation(fields: [reviewId], references: [id])
+  product  Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  review   Reviews?  @relation(fields: [reviewId], references: [id], onDelete: SetNull)
 
   @@index([type])
 }

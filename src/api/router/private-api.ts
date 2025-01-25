@@ -7,6 +7,7 @@ import {ProductController} from "../controller/product-controller";
 
 export const privateApi = express.Router();
 
+// API ADMIN
 privateApi.post("/admin/category/create", authenticate, checkRole('ADMIN'), upload.single('image'), CategoryController.create);
 privateApi.get("/admin/category", authenticate, checkRole('ADMIN') ,CategoryController.getAll);
 privateApi.get("/admin/category/:slug", authenticate, checkRole('ADMIN'),  CategoryController.getSingle);
@@ -15,5 +16,13 @@ privateApi.get("/admin/category/:slug/softDelete", authenticate, checkRole('ADMI
 privateApi.get("/admin/category/:slug/forceDelete", authenticate, checkRole('ADMIN'),  CategoryController.forceDelete);
 privateApi.get("/admin/category/:slug/activated", authenticate, checkRole('ADMIN'),  CategoryController.activatedCategory);
 
+privateApi.get("/admin/product/active/:slug", authenticate, checkRole('ADMIN'), ProductController.activationProduct)
+
+// API CUSTOMER AND SELLER
 privateApi.post("/store/create", authenticate, StoreController.create);
+
+// API SELLER
 privateApi.post("/product/create", authenticate, checkRole('SELLER'), upload.array('image'), ProductController.create);
+privateApi.get("/product", authenticate, checkRole('SELLER'), ProductController.getAll);
+privateApi.put("/product/:slug", authenticate, checkRole('SELLER'), upload.array('image'), ProductController.update);
+privateApi.delete("/product/:slug", authenticate, checkRole('SELLER'), ProductController.forceDelete);

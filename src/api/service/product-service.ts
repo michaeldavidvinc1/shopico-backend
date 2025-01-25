@@ -1,27 +1,34 @@
-import {CreateProduct} from "../../model/request/product-request";
-import {ApiProduct} from "../../model/response/product-response";
+import {CreateProduct, SearchProduct, UpdateProduct} from "../../model/request/product-request";
+import {ApiProduct, toProductResponse} from "../../model/response/product-response";
 import {prismaClient} from "../../db/prisma";
 import {BadRequest} from "../../errors";
 import {Validation} from "../../validation/validation";
-import {CategoryValidation} from "../../validation/category-validation";
 import {ProductValidation} from "../../validation/product-validation";
+import {Pageable} from "../../model/response/page";
+import {ExtractPublicId} from "../../helpers/extractPubliId";
+import cloudinary from "../../lib/cloudinary";
 
 export class ProductService {
-    static async checkProduct(productSlug: string): Promise<ApiProduct>{
+    static async checkProduct(productSlug: string): Promise<ApiProduct> {
         const product = await prismaClient.product.findFirst({
             where: {
                 slug: productSlug
+            },
+            include: {
+                image: true
             }
         })
 
-        if(!product) {
+        if (!product) {
             throw new BadRequest("Product not found");
         }
 
-        return product;
+        return toProductResponse(product);
     }
+
     static async create(req: CreateProduct): Promise<ApiProduct> {
         const createProduct = Validation.validate(ProductValidation.CREATE, req);
+
         const duplicateData = await prismaClient.product.findFirst({
             where: {
                 slug: createProduct.slug
@@ -45,16 +52,148 @@ export class ProductService {
             },
         });
 
-        for(const image of createProduct.image){
+        for (const image of createProduct.image) {
             await prismaClient.image.create({
                 data: {
                     url: image,
                     type: "product",
-                    productId: product.slug
+                    productId: product.id
                 }
             })
         }
 
+        return await this.checkProduct(product.slug);
+    }
+
+    static async getAll(req: SearchProduct): Promise<Pageable<ApiProduct>> {
+        const searchProduct = Validation.validate(ProductValidation.SEARCH, req);
+
+        const skip = (searchProduct.page - 1) * searchProduct.size;
+
+        const filters: { [key: string]: any } = {};
+
+        if (searchProduct.name) {
+            filters.name = {contains: searchProduct.name};
+        }
+
+        if (searchProduct.storeId) {
+            filters.name = {contains: searchProduct.storeId};
+        }
+
+        if (searchProduct.categoryId) {
+            filters.name = {contains: searchProduct.categoryId};
+        }
+
+        filters.status = {
+            equals: searchProduct.status !== undefined ? searchProduct.status : true,
+        };
+        const product = await prismaClient.product.findMany({
+            where: {...filters},
+            include: {
+                image: true,
+            },
+            take: searchProduct.size,
+            skip: skip,
+        });
+
+        const total = await prismaClient.product.count({
+            where: {...filters},
+        });
+
+        return {
+            data: product.map((product) => toProductResponse(product)),
+            paging: {
+                current_page: searchProduct.page,
+                total_page: Math.ceil(total / searchProduct.size),
+                size: searchProduct.size,
+            },
+        };
+    }
+
+    static async update(req: UpdateProduct, productSlug: string): Promise<ApiProduct> {
+        const updateProduct = Validation.validate(ProductValidation.UPDATE, req);
+        const existingData = await this.checkProduct(productSlug);
+
+        const existingImages = await prismaClient.image.findMany({
+            where: { productId: existingData.id }
+        });
+        const dbImageUrls = existingImages.map((img: any) => img.url);
+
+        // Ensure updateProduct.image is an array and filter out any duplicates
+        const updateProductImages = Array.isArray(updateProduct.image) ? updateProduct.image : [];
+
+        // Determine images to delete (those no longer in the updated list)
+        const imagesToDelete = dbImageUrls.filter(url => !updateProductImages.includes(url));
+
+        // Use transaction for both Cloudinary deletion and database removal in one go
+        const deleteImagePromises = imagesToDelete.map(async (url) => {
+            const publicId = ExtractPublicId(url);
+            await cloudinary.uploader.destroy(publicId);
+            await prismaClient.image.deleteMany({
+                where: { productId: existingData.id, url: url },
+            });
+        });
+
+        // Create or update images in a single pass
+        const newImages = updateProductImages.filter(url => !dbImageUrls.includes(url));
+        const createImagePromises = newImages.map(url => prismaClient.image.create({
+            data: { type: "product", productId: existingData.id, url: url },
+        }));
+
+        // Execute image deletion and creation in parallel
+        await Promise.all([...deleteImagePromises, ...createImagePromises]);
+
+        // Update product details
+        const updatedProduct = await prismaClient.product.update({
+            where: { slug: productSlug },
+            data: {
+                storeId: updateProduct.storeId,
+                categoryId: updateProduct.categoryId,
+                name: updateProduct.name,
+                slug: updateProduct.slug,
+                description: updateProduct.description, // fixed field
+                stock: updateProduct.stock,
+                price: updateProduct.price,
+                weight: updateProduct.weight,
+            },
+        });
+
+        return this.checkProduct(updatedProduct.slug);
+    }
+
+    static async forceDelete(slug: string) {
+
+        await this.checkProduct(slug);
+
+        const product = await prismaClient.product.delete({
+            where: {
+                slug: slug
+            }
+        })
+
+        await prismaClient.image.deleteMany({
+            where: {
+                productId: product.id
+            }
+        })
+
+
         return product;
+    }
+
+    static async activatedProduct(slug: string): Promise<ApiProduct> {
+
+        await this.checkProduct(slug);
+
+        const product = await prismaClient.product.update({
+            where: {
+                slug: slug
+            },
+            data: {
+                status: true
+            }
+        })
+
+        return await this.checkProduct(product.slug);
     }
 }

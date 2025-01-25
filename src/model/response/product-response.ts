@@ -1,4 +1,4 @@
-import {Product} from "@prisma/client";
+import { Image, Product } from "@prisma/client";
 
 export type ApiProduct = {
     id: string;
@@ -11,9 +11,14 @@ export type ApiProduct = {
     price: number;
     weight: number | null;
     status: boolean;
+    image: {
+        id: string;
+        url: string;
+        type: string;
+    }[];
 }
 
-export function toProductResponse(product: Product): ApiProduct {
+export function toProductResponse(product: Product & { image: Image[] }): ApiProduct {
     return {
         id: product.id,
         name: product.name,
@@ -25,5 +30,10 @@ export function toProductResponse(product: Product): ApiProduct {
         price: product.price,
         weight: product.weight,
         status: product.status,
+        image: product.image.map(img => ({
+            id: img.id,
+            url: img.url,
+            type: img.type,
+        })),
     };
 }

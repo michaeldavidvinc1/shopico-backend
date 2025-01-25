@@ -75,6 +75,7 @@ export class AuthService {
     return {
       ...response,
       token: token,
+      id: user.id
     };
   }
 

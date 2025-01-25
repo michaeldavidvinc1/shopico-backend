@@ -1,186 +1,207 @@
-// import { prismaClient } from "../../db/prisma";
-// import { BadRequest, NotFound } from "../../errors";
-// import {
-//   CreateCategory,
-//   SearchCategory,
-//   UpdateCategory,
-// } from "../../model/request/category-request";
-// import {
-//   ApiCategory,
-//   toCategoryResponse,
-// } from "../../model/response/category-response";
-// import { Validation } from "../../validation/validation";
-// import { CategoryValidation } from "../../validation/category-validation";
-// import { Pageable } from "../../model/response/page";
-// import cloudinary from "../../lib/cloudinary";
-// import { ExtractPublicId } from "../../helpers/extractPubliId";
-//
-// export class CategoryService {
-//   static async checkCategoryMustExists(
-//     categorySlug: string
-//   ): Promise<ApiCategory> {
-//     const category = await prismaClient.category.findFirst({
-//       where: {
-//         slug: categorySlug,
-//       },
-//     });
-//
-//     if (!category) {
-//       throw new NotFound("Category not found");
-//     }
-//
-//     return category;
-//   }
-//
-//   static async create(req: CreateCategory): Promise<ApiCategory> {
-//     const createCategory = Validation.validate(CategoryValidation.CREATE, req);
-//
-//     const duplicateData = await prismaClient.category.findFirst({
-//       where: {
-//         slug: createCategory.slug,
-//       },
-//     });
-//
-//     if (duplicateData) {
-//       throw new BadRequest("Category name already exists");
-//     }
-//
-//     const category = await prismaClient.category.create({
-//       data: createCategory,
-//     });
-//
-//     return category;
-//   }
-//
-//   static async getAll(req: SearchCategory): Promise<Pageable<ApiCategory>> {
-//     const searchCategory = Validation.validate(CategoryValidation.SEARCH, req);
-//
-//     const skip = (searchCategory.page - 1) * searchCategory.size;
-//
-//     const filters: { [key: string]: any } = {};
-//
-//     if (searchCategory.name) {
-//       filters.name = {
-//         contains: searchCategory.name,
-//       };
-//     }
-//     if (searchCategory.status !== undefined) {
-//       filters.status = {
-//         equals: searchCategory.status, // Gunakan `equals` untuk Boolean
-//       };
-//     } else {
-//       filters.status = {
-//         equals: true, // Default ke true
-//       };
-//     }
-//     const category = await prismaClient.category.findMany({
-//       where: {
-//         ...filters,
-//       },
-//       take: searchCategory.size,
-//       skip: skip,
-//     });
-//
-//     const total = await prismaClient.category.count();
-//
-//     return {
-//       data: category.map((category) => toCategoryResponse(category)),
-//       paging: {
-//         current_page: searchCategory.page,
-//         total_page: Math.ceil(total / searchCategory.size),
-//         size: searchCategory.size,
-//       },
-//     };
-//   }
-//
-//   static async getSingle(slug: string): Promise<ApiCategory> {
-//     const category = await prismaClient.category.findFirst({
-//       where: {
-//         slug: slug,
-//       },
-//     });
-//
-//     if (!category) {
-//       throw new NotFound("Category not found");
-//     }
-//
-//     return toCategoryResponse(category);
-//   }
-//
-//   static async update(req: UpdateCategory, categorySlug: string): Promise<ApiCategory> {
-//     const updateRequest = Validation.validate(CategoryValidation.UPDATE, req);
-//
-//     const existingData = await this.checkCategoryMustExists(categorySlug);
-//
-//     if (updateRequest.image === null) {
-//       updateRequest.image = existingData.image;
-//     } else {
-//       if (existingData.image) {
-//         const publicId = ExtractPublicId(existingData.image);
-//         console.log(publicId)
-//         await cloudinary.uploader.destroy(publicId);
-//       }
-//     }
-//
-//
-//     const category = await prismaClient.category.update({
-//       where: {
-//         slug: categorySlug,
-//       },
-//       data: {
-//         name: updateRequest.name,
-//         slug: updateRequest.slug,
-//         image: updateRequest.image,
-//         status: updateRequest.status,
-//       },
-//     });
-//
-//     return toCategoryResponse(category);
-//   }
-//
-//   static async softDelete(slug: string): Promise<ApiCategory>{
-//
-//     await this.checkCategoryMustExists(slug);
-//
-//     const category = await prismaClient.category.update({
-//       where: {
-//         slug: slug
-//       },
-//       data: {
-//         status: false
-//       }
-//     })
-//
-//     return category;
-//   }
-//
-//   static async forceDelete(slug: string): Promise<ApiCategory>{
-//
-//     await this.checkCategoryMustExists(slug);
-//
-//     const category = await prismaClient.category.delete({
-//       where: {
-//         slug: slug
-//       }
-//     })
-//
-//     return category;
-//   }
-//
-//   static async activatedCategory(slug: string): Promise<ApiCategory>{
-//
-//     await this.checkCategoryMustExists(slug);
-//
-//     const category = await prismaClient.category.update({
-//       where: {
-//         slug: slug
-//       },
-//       data: {
-//         status: true
-//       }
-//     })
-//
-//     return category;
-//   }
-//
-// }
+import {prismaClient} from "../../db/prisma";
+import {BadRequest, NotFound} from "../../errors";
+import {
+    CreateCategory,
+    SearchCategory,
+    UpdateCategory,
+} from "../../model/request/category-request";
+import {
+    ApiCategory,
+    toCategoryResponse,
+} from "../../model/response/category-response";
+import {Validation} from "../../validation/validation";
+import {CategoryValidation} from "../../validation/category-validation";
+import {Pageable} from "../../model/response/page";
+import cloudinary from "../../lib/cloudinary";
+import {ExtractPublicId} from "../../helpers/extractPubliId";
+
+export class CategoryService {
+    static async checkCategoryMustExists(categorySlug: string): Promise<ApiCategory> {
+        const category = await prismaClient.category.findFirst({
+            where: {
+                slug: categorySlug,
+            },
+            include: {
+                image: true
+            }
+        });
+
+        if (!category) {
+            throw new NotFound("Category not found");
+        }
+
+        return toCategoryResponse(category);
+    }
+
+    static async create(req: CreateCategory): Promise<ApiCategory> {
+        const {image, ...createCategory} = Validation.validate(CategoryValidation.CREATE, req);
+
+        const duplicateData = await prismaClient.category.findFirst({
+            where: {
+                slug: createCategory.slug,
+            },
+        });
+
+        if (duplicateData) {
+            throw new BadRequest("Category name already exists");
+        }
+
+        const category = await prismaClient.category.create({
+            data: createCategory,
+        });
+
+        if (image) {
+            await prismaClient.image.create({
+                data: {
+                    url: image,
+                    type: "category",
+                    categoryId: category.id
+                }
+            })
+        }
+
+        return await this.checkCategoryMustExists(category.slug);
+
+    }
+
+    static async getAll(req: SearchCategory): Promise<Pageable<ApiCategory>> {
+        const searchCategory = Validation.validate(CategoryValidation.SEARCH, req);
+
+        const skip = (searchCategory.page - 1) * searchCategory.size;
+
+        const filters: { [key: string]: any } = {};
+
+        if (searchCategory.name) {
+            filters.name = {contains: searchCategory.name};
+        }
+        filters.status = {
+            equals: searchCategory.status !== undefined ? searchCategory.status : true,
+        };
+
+        const categories = await prismaClient.category.findMany({
+            where: {...filters},
+            include: {
+                image: true,
+            },
+            take: searchCategory.size,
+            skip: skip,
+        });
+
+        const total = await prismaClient.category.count({
+            where: {...filters},
+        });
+
+        return {
+            data: categories.map((category) => toCategoryResponse(category)),
+            paging: {
+                current_page: searchCategory.page,
+                total_page: Math.ceil(total / searchCategory.size),
+                size: searchCategory.size,
+            },
+        };
+    }
+
+    static async getSingle(slug: string): Promise<ApiCategory> {
+        const category = await prismaClient.category.findFirst({
+            where: {
+                slug: slug,
+            },
+            include: {
+                image: true,
+            }
+        });
+
+        if (!category) {
+            throw new NotFound("Category not found");
+        }
+
+        return toCategoryResponse(category);
+    }
+
+    static async update(req: UpdateCategory, categorySlug: string): Promise<ApiCategory> {
+        const {image, ...updateCategory} = Validation.validate(CategoryValidation.UPDATE, req);
+
+        const existingData = await this.checkCategoryMustExists(categorySlug);
+
+        const existingImage = await prismaClient.image.findFirst({
+            where: {
+                categoryId: existingData.id
+            }
+        })
+        if (image) {
+            if (existingImage) {
+                // Delete previous image in cloudinary
+                const publicId = ExtractPublicId(existingImage.url);
+                await cloudinary.uploader.destroy(publicId);
+                // Update new image url in model Image
+                const data = await prismaClient.image.update({
+                    where: {
+                        categoryId: existingData.id
+                    },
+                    data: {
+                        url: image
+                    }
+                })
+            }
+        }
+
+        const category = await prismaClient.category.update({
+            where: {
+                slug: categorySlug,
+            },
+            data: {
+                name: updateCategory.name,
+                slug: updateCategory.slug,
+                status: updateCategory.status,
+            },
+        });
+
+        return await this.checkCategoryMustExists(category.slug);
+    }
+
+    static async softDelete(slug: string): Promise<ApiCategory> {
+
+        await this.checkCategoryMustExists(slug);
+
+        const category = await prismaClient.category.update({
+            where: {
+                slug: slug
+            },
+            data: {
+                status: false
+            }
+        })
+
+        return await this.checkCategoryMustExists(category.slug);
+    }
+
+    static async forceDelete(slug: string): Promise<ApiCategory> {
+
+        await this.checkCategoryMustExists(slug);
+
+        const category = await prismaClient.category.delete({
+            where: {
+                slug: slug
+            }
+        })
+
+        return await this.checkCategoryMustExists(category.slug);
+    }
+
+    static async activatedCategory(slug: string): Promise<ApiCategory> {
+
+        await this.checkCategoryMustExists(slug);
+
+        const category = await prismaClient.category.update({
+            where: {
+                slug: slug
+            },
+            data: {
+                status: true
+            }
+        })
+
+        return await this.checkCategoryMustExists(category.slug);
+    }
+
+    }

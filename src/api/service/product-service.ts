@@ -50,7 +50,7 @@ export class ProductService {
                 data: {
                     url: image,
                     type: "product",
-                    productId: product.id
+                    productId: product.slug
                 }
             })
         }

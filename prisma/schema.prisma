@@ -83,9 +83,9 @@ model Category {
 model Product {
   id          String   @id @default(cuid())
   storeId     String
-  store       Store    @relation(fields: [storeId], references: [id])
+  store       Store    @relation(fields: [storeId], references: [slug])
   categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [slug])
   name        String
   slug        String   @unique
   description String?
@@ -109,7 +109,7 @@ model Product {
 model ProductView {
   id        String   @id @default(cuid())
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [slug])
   createdAt DateTime @default(now())
 }
 
@@ -118,7 +118,7 @@ model Order {
   userId          String
   user            User          @relation(fields: [userId], references: [id])
   storeId         String
-  store           Store         @relation(fields: [storeId], references: [id])
+  store           Store         @relation(fields: [storeId], references: [slug])
   invoiceNumber   String        @unique
   totalAmount     BigInt
   shippingAddress String
@@ -141,7 +141,7 @@ model OrderItem {
   orderId   String
   order     Order    @relation(fields: [orderId], references: [id])
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [slug])
   quantity  Int
   price     BigInt
   subTotal  BigInt
@@ -154,7 +154,7 @@ model Cart {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [slug])
   quantity  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -165,7 +165,7 @@ model Cart {
 model Transaction {
   id          String        @id @default(cuid())
   storeId     String
-  store       Store         @relation(fields: [storeId], references: [id])
+  store       Store         @relation(fields: [storeId], references: [slug])
   orderId     String
   order       Order         @relation(fields: [orderId], references: [id])
   amount      BigInt
@@ -183,7 +183,7 @@ model Reviews {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [slug])
   orderId   String
   order     Order    @relation(fields: [orderId], references: [id])
   rating    Int
@@ -200,7 +200,7 @@ model Wishlist {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [slug])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -208,7 +208,7 @@ model Wishlist {
 model StoreView {
   id         String   @id @default(cuid())
   storeId    String
-  store      Store    @relation(fields: [storeId], references: [id])
+  store      Store    @relation(fields: [storeId], references: [slug])
   viewsCount Int
   date       DateTime
 }

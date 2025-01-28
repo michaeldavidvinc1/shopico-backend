@@ -1,13 +1,5 @@
 import { Store } from "@prisma/client";
 
-export type Json = 
-  | string 
-  | number 
-  | boolean 
-  | null 
-  | { [key: string]: Json } 
-  | Json[];
-
 export type ApiStore = {
     id: string;
     userId: string;

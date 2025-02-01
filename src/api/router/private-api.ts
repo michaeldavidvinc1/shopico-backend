@@ -4,6 +4,7 @@ import CategoryController from "../controller/category-controller";
 import { authenticate, checkRole } from "../../middleware/auth";
 import { StoreController } from "../controller/store-controller";
 import {ProductController} from "../controller/product-controller";
+import { SellerController } from "../controller/seller-controller";
 
 export const privateApi = express.Router();
 
@@ -29,3 +30,4 @@ privateApi.delete("/product/:slug", authenticate, checkRole('SELLER'), ProductCo
 
 privateApi.get("/verify/store/:storeSlug", authenticate, checkRole('SELLER'), StoreController.checkStore)
 privateApi.get("/store/list/:id", authenticate, checkRole('SELLER'), StoreController.getStoreByUser);
+privateApi.get("/get-all/category", authenticate, checkRole('SELLER'), SellerController.getAllCategory);

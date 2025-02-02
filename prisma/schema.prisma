@@ -19,6 +19,11 @@ enum PaymentStatus {
   COMPLETED
 }
 
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String
@@ -27,7 +32,7 @@ model User {
   phone         String?
   role          Role      @default(CUSTOMER)
   avatar        String?
-  status        Boolean   @default(true)
+  status        Status    @default(ACTIVE)
   emailVerified DateTime?
   authType      String?
   createdAt     DateTime  @default(now())
@@ -54,7 +59,7 @@ model Store {
   banner      String?
   address     String?
   phone       String?
-  status      Boolean  @default(true)
+  status      Status   @default(ACTIVE)
   balance     BigInt   @default(0)
   bankInfo    String?
   createdAt   DateTime @default(now())
@@ -73,7 +78,7 @@ model Category {
   name      String
   slug      String   @unique
   image     Image?
-  status    Boolean  @default(true)
+  status    Status   @default(ACTIVE)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -93,7 +98,7 @@ model Product {
   image       Image[]
   price       Int
   weight      Int?
-  status      Boolean  @default(false)
+  status      Status   @default(ACTIVE)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

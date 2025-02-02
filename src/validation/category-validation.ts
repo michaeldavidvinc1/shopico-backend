@@ -8,7 +8,7 @@ export class CategoryValidation {
   });
   static readonly SEARCH: ZodType = z.object({
     name: z.string().optional(),
-    status: z.boolean().optional(),
+    status: z.string().optional(),
     page: z.number().min(1).positive(),
     size: z.number().min(1).max(100).positive(),
   });
@@ -16,6 +16,6 @@ export class CategoryValidation {
     name: z.string().min(1).optional(),
     slug: z.string().min(1).optional(),
     image: z.string().nullable().optional(),
-    status: z.boolean()
+    status: z.string()
   });
 }

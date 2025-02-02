@@ -12,9 +12,7 @@ export type CreateProduct = {
 
 export type SearchProduct = {
     name: string;
-    storeId: string;
-    categoryId: string;
-    status: boolean;
+    status: string;
     page: number;
     size: number;
 };

@@ -1,6 +1,6 @@
 import { Role } from "@prisma/client";
 import { prismaClient } from "../../db/prisma";
-import { BadRequest } from "../../errors";
+import { BadRequest, NotFound } from "../../errors";
 import { CreateStore } from "../../model/request/store-request";
 import { ApiStore, toStoreResponse } from "../../model/response/store-response";
 import { StoreValidation } from "../../validation/store-validation";
@@ -18,6 +18,21 @@ interface JwtPayload {
 }
 
 export class StoreService {
+
+    static async checkStoreExists(storeSlug: string): Promise<ApiStore>{
+        const store = await prismaClient.store.findFirst({
+            where: {
+                slug: storeSlug
+            }
+        })
+
+        if(!store){
+            throw new NotFound("Store not found!")
+        }
+
+        return toStoreResponse(store);
+    }
+
     static async create(req: CreateStore): Promise<ApiStore>{
          const createStore = Validation.validate(StoreValidation.CREATE, req);
 

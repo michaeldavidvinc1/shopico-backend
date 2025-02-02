@@ -35,7 +35,7 @@ class CategoryController {
         try {
             const request: SearchCategory = {
                 name: (req.query.name as string) || "",
-                status: req.query.status ? req.query.status === 'true' : true,
+                status: (req.query.name as string) || "",
                 page: req.query.page ? Number(req.query.page) : 1,
                 size: req.query.size ? Number(req.query.size) : 10,
             };
@@ -68,9 +68,6 @@ class CategoryController {
         try {
             const categorySlug = req.params.slug;
             const request: UpdateCategory = req.body as UpdateCategory;
-            if (req.body.status === "true") {
-                request.status = true
-            }
             if (req.file) {
                 const filePath = req.file.path;
                 const result = await cloudinary.uploader.upload(filePath, {

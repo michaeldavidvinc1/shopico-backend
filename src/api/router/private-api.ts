@@ -24,7 +24,7 @@ privateApi.post("/store/create", authenticate, StoreController.create);
 
 // API SELLER
 privateApi.post("/product/create", authenticate, checkRole('SELLER'), upload.array('image'), ProductController.create);
-privateApi.get("/product", authenticate, checkRole('SELLER'), ProductController.getAll);
+privateApi.get("/product/:slugStore", authenticate, checkRole('SELLER'), ProductController.getAllByStore);
 privateApi.put("/product/:slug", authenticate, checkRole('SELLER'), upload.array('image'), ProductController.update);
 privateApi.delete("/product/:slug", authenticate, checkRole('SELLER'), ProductController.forceDelete);
 

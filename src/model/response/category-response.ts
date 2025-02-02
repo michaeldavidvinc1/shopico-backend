@@ -4,7 +4,7 @@ export type ApiCategory = {
     id: string;
     name: string;
     slug: string;
-    status: boolean;
+    status: string;
     image?: {
         id: string;
         url: string;

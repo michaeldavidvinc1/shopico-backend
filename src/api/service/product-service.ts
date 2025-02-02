@@ -7,6 +7,9 @@ import {ProductValidation} from "../../validation/product-validation";
 import {Pageable} from "../../model/response/page";
 import {ExtractPublicId} from "../../helpers/extractPubliId";
 import cloudinary from "../../lib/cloudinary";
+import { StoreService } from "./store-service";
+import { CategoryService } from "./category-service";
+import { Status } from "@prisma/client";
 
 export class ProductService {
     static async checkProduct(productSlug: string): Promise<ApiProduct> {
@@ -39,6 +42,10 @@ export class ProductService {
             throw new BadRequest("Product name already exists");
         }
 
+        await StoreService.checkStoreExists(createProduct.storeId);
+
+        await CategoryService.checkCategoryMustExists(createProduct.categoryId)
+
         const product = await prismaClient.product.create({
             data: {
                 storeId: createProduct.storeId,
@@ -65,7 +72,7 @@ export class ProductService {
         return await this.checkProduct(product.slug);
     }
 
-    static async getAll(req: SearchProduct): Promise<Pageable<ApiProduct>> {
+    static async getAllByStore(req: SearchProduct, slugStore: string): Promise<Pageable<ApiProduct>> {
         const searchProduct = Validation.validate(ProductValidation.SEARCH, req);
 
         const skip = (searchProduct.page - 1) * searchProduct.size;
@@ -76,17 +83,14 @@ export class ProductService {
             filters.name = {contains: searchProduct.name};
         }
 
-        if (searchProduct.storeId) {
-            filters.name = {contains: searchProduct.storeId};
+        if (searchProduct.status) {
+            filters.status = {contains: searchProduct.status};
         }
 
-        if (searchProduct.categoryId) {
-            filters.name = {contains: searchProduct.categoryId};
+        if (slugStore) {
+            filters.storeId = slugStore;
         }
-
-        filters.status = {
-            equals: searchProduct.status !== undefined ? searchProduct.status : true,
-        };
+        console.log(filters)
         const product = await prismaClient.product.findMany({
             where: {...filters},
             include: {
@@ -95,6 +99,7 @@ export class ProductService {
             take: searchProduct.size,
             skip: skip,
         });
+
 
         const total = await prismaClient.product.count({
             where: {...filters},
@@ -190,7 +195,7 @@ export class ProductService {
                 slug: slug
             },
             data: {
-                status: true
+                status: Status.ACTIVE
             }
         })
 

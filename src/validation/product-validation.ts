@@ -14,9 +14,7 @@ export class ProductValidation {
     });
     static readonly SEARCH: ZodType = z.object({
         name: z.string().optional(),
-        storeId: z.string().optional(),
-        categoryId: z.string().optional(),
-        status: z.boolean().optional(),
+        status: z.string().optional(),
         page: z.number().min(1).positive(),
         size: z.number().min(1).max(100).positive(),
     });

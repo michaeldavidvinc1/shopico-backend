@@ -10,7 +10,7 @@ export type ApiProduct = {
     stock: number;
     price: number;
     weight: number | null;
-    status: boolean;
+    status: string;
     image: {
         id: string;
         url: string;

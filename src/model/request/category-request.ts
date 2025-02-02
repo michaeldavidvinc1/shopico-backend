@@ -6,7 +6,7 @@ export type CreateCategory = {
 
 export type SearchCategory = {
   name: string;
-  status: boolean;
+  status: string;
   page: number;
   size: number;
 };
@@ -15,5 +15,5 @@ export type UpdateCategory = {
     name: string;
     slug: string;
     image: string | null;
-    status: boolean;
+    status: string;
 }

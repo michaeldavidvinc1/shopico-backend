@@ -10,7 +10,7 @@ export type ApiStore = {
     banner: string | null;
     address: string | null;
     phone: string | null;
-    status: boolean;
+    status: string;
     balance: string;
     bankInfo: string | null;
 }

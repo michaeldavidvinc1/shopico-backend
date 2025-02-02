@@ -90,11 +90,11 @@ export class ProductService {
         if (slugStore) {
             filters.storeId = slugStore;
         }
-        console.log(filters)
         const product = await prismaClient.product.findMany({
             where: {...filters},
             include: {
                 image: true,
+                category: true
             },
             take: searchProduct.size,
             skip: skip,

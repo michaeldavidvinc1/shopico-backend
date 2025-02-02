@@ -1,11 +1,14 @@
-import { Image, Product } from "@prisma/client";
+import { Category, Image, Product } from "@prisma/client";
 
 export type ApiProduct = {
     id: string;
     name: string;
     slug: string;
     storeId: string;
-    categoryId: string;
+    category: {
+        id: string;
+        name: string;
+    };
     description: string | null;
     stock: number;
     price: number;
@@ -18,13 +21,16 @@ export type ApiProduct = {
     }[];
 }
 
-export function toProductResponse(product: Product & { image: Image[] }): ApiProduct {
+export function toProductResponse(product: Product & { image: Image[], category: Category }): ApiProduct {
     return {
         id: product.id,
         name: product.name,
         slug: product.slug,
         storeId: product.storeId,
-        categoryId: product.categoryId,
+        category: {
+            id: product.category.id,
+            name: product.category.name
+        },
         description: product.description,
         stock: product.stock,
         price: product.price,

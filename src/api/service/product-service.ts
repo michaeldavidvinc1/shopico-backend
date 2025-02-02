@@ -18,7 +18,8 @@ export class ProductService {
                 slug: productSlug
             },
             include: {
-                image: true
+                image: true,
+                category: true
             }
         })
 
@@ -81,7 +82,7 @@ export class ProductService {
 
         if (searchProduct.name) {
             filters.name = {contains: searchProduct.name};
-        }
+    }
 
         if (searchProduct.status) {
             filters.status = {contains: searchProduct.status};
@@ -93,8 +94,8 @@ export class ProductService {
         const product = await prismaClient.product.findMany({
             where: {...filters},
             include: {
+                category: true,
                 image: true,
-                category: true
             },
             take: searchProduct.size,
             skip: skip,

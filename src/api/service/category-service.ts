@@ -72,7 +72,7 @@ export class CategoryService {
 
     const skip = (searchCategory.page - 1) * searchCategory.size;
 
-    const filters: { [key: string]: any } = {};
+    const filters: Record<string, unknown> = {};
 
     if (searchCategory.name) {
       filters.name = { contains: searchCategory.name };

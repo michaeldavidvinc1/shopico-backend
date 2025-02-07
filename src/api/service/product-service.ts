@@ -78,7 +78,7 @@ export class ProductService {
 
         const skip = (searchProduct.page - 1) * searchProduct.size;
 
-        const filters: { [key: string]: any } = {};
+        const filters: Record<string, unknown> = {};
 
         if (searchProduct.name) {
             filters.name = {contains: searchProduct.name};
@@ -123,15 +123,12 @@ export class ProductService {
         const existingImages = await prismaClient.image.findMany({
             where: { productId: existingData.id }
         });
-        const dbImageUrls = existingImages.map((img: any) => img.url);
+        const dbImageUrls = existingImages.map((img: {url: string}) => img.url);
 
-        // Ensure updateProduct.image is an array and filter out any duplicates
         const updateProductImages = Array.isArray(updateProduct.image) ? updateProduct.image : [];
 
-        // Determine images to delete (those no longer in the updated list)
         const imagesToDelete = dbImageUrls.filter(url => !updateProductImages.includes(url));
 
-        // Use transaction for both Cloudinary deletion and database removal in one go
         const deleteImagePromises = imagesToDelete.map(async (url) => {
             const publicId = ExtractPublicId(url);
             await cloudinary.uploader.destroy(publicId);

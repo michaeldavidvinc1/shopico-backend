@@ -1,42 +1,53 @@
 import { StatusCodes } from "http-status-codes";
 import { Response, Request, NextFunction } from "express";
 
-interface CustomError {
-  statusCode: number;
-  msg: string;
+interface CustomError extends Error {
+  statusCode?: number;
+  code?: number;
+  keyValue?: Record<string, unknown>;
+  errors?: Record<string, { message: string }>;
+  value?: string;
 }
 
 const errorHandlerMiddleware = (
-  err: any,
+  err: unknown,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  const error = err as CustomError; // Type assertion
+
   let customError: CustomError = {
-    statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
-    msg: err.message || "Something went wrong, try again later",
+    name: error.name || "Error", // Tambahkan 'name'
+    statusCode: error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
+    message: error.message || "Something went wrong, try again later",
   };
 
-  // error validation from mongoose
-  if (err.name === "ValidationError") {
-    customError.msg = (Object.values(err.errors) as any[]).map(
-      (item) => item.message
-    ).join(", ");
+  // Handle Mongoose validation error
+  if (error.name === "ValidationError" && error.errors) {
+    customError.message = Object.values(error.errors)
+      .map((item) => item.message)
+      .join(", ");
     customError.statusCode = StatusCodes.BAD_REQUEST;
   }
 
-  if (err.code && err.code === 11000) {
-    customError.msg = `Duplicate value entered for ${Object.keys(
-      err.keyValue
+  // Handle Mongoose duplicate key error
+  if (error.code === 11000 && error.keyValue) {
+    customError.message = `Duplicate value entered for ${Object.keys(
+      error.keyValue
     )} field, please choose another value`;
     customError.statusCode = StatusCodes.BAD_REQUEST;
   }
-  if (err.name === "CastError") {
-    customError.msg = `No item found with id : ${err.value}`;
+
+  // Handle invalid MongoDB ObjectId
+  if (error.name === "CastError" && error.value) {
+    customError.message = `No item found with id: ${error.value}`;
     customError.statusCode = StatusCodes.NOT_FOUND;
   }
 
-  return res.status(customError.statusCode).json({ msg: customError.msg });
+  return res
+    .status(customError.statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR)
+    .json({ msg: customError.message });
 };
 
 export default errorHandlerMiddleware;

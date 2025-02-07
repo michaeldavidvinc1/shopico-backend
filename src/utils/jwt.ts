@@ -3,7 +3,7 @@ import config from "../config";
 import { Response } from "express";
 
 interface CreateJWTParams {
-  payload: any;
+  payload: Record<string, unknown>;
   res: Response;
 }
 

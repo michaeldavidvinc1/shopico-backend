@@ -124,6 +124,7 @@ export class ProductService {
     static async update(req: UpdateProduct, productSlug: string): Promise<ApiProduct> {
         const updateProduct = Validation.validate(ProductValidation.UPDATE, req);
         const existingData = await this.checkProduct(productSlug);
+        console.log(updateProduct)
 
         const existingImages = await prismaClient.image.findMany({
             where: { productId: existingData.id }

@@ -8,6 +8,7 @@ export type ApiProduct = {
     category: {
         id: string;
         name: string;
+        slug: string;
     };
     description: string | null;
     stock: number;
@@ -29,7 +30,8 @@ export function toProductResponse(product: Product & { image: Image[], category:
         storeId: product.storeId,
         category: {
             id: product.category.id,
-            name: product.category.name
+            name: product.category.name,
+            slug: product.category.slug
         },
         description: product.description,
         stock: product.stock,

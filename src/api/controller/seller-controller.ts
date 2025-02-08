@@ -10,8 +10,12 @@ export class SellerController {
         message: "Get all category successfully",
         data: result,
       });
-    } catch (error) {
-      next(error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error);
+      } else {
+        next(new Error("An unknown error occurred"));
+      }
     }
   }
 }

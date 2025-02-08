@@ -116,6 +116,11 @@ export class ProductService {
         };
     }
 
+    static async getSingleProduct(productSlug: string ): Promise<ApiProduct> {
+        const product = await this.checkProduct(productSlug);
+        return product;
+    }
+
     static async update(req: UpdateProduct, productSlug: string): Promise<ApiProduct> {
         const updateProduct = Validation.validate(ProductValidation.UPDATE, req);
         const existingData = await this.checkProduct(productSlug);

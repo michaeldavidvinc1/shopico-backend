@@ -12,8 +12,12 @@ export class AuthController {
                 message: "Register successfully",
                 data: result,
             });
-        } catch (e) {
-            next(e);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                next(new Error("An unknown error occurred"));
+            }
         }
     }
 
@@ -26,8 +30,12 @@ export class AuthController {
                 message: "Login successfully",
                 data: result,
             });
-        } catch (e) {
-            next(e);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                next(new Error("An unknown error occurred"));
+            }
         }
     }
 
@@ -40,8 +48,12 @@ export class AuthController {
                 message: "Login successfully",
                 data: result,
             });
-        } catch (e) {
-            next(e);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                next(new Error("An unknown error occurred"));
+            }
         }
     }
 }

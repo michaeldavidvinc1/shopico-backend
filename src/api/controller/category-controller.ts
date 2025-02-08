@@ -26,8 +26,12 @@ class CategoryController {
                 message: "Create category successfully",
                 data: result,
             });
-        } catch (e) {
-            next(e);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                next(new Error("An unknown error occurred"));
+            }
         }
     }
 
@@ -45,8 +49,12 @@ class CategoryController {
                 message: "Get All category successfully",
                 data: result,
             });
-        } catch (error) {
-            next(error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                next(new Error("An unknown error occurred"));
+            }
         }
     }
 
@@ -59,8 +67,12 @@ class CategoryController {
                 message: "Get single category successfully",
                 data: result,
             });
-        } catch (error) {
-            next(error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                next(new Error("An unknown error occurred"));
+            }
         }
     }
 
@@ -84,8 +96,12 @@ class CategoryController {
                 message: "Update category successfully",
                 data: result,
             });
-        } catch (error) {
-            next(error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                next(new Error("An unknown error occurred"));
+            }
         }
     }
 
@@ -98,8 +114,12 @@ class CategoryController {
                 message: "Delete category successfully",
                 data: result,
             });
-        } catch (error) {
-            next(error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                next(new Error("An unknown error occurred"));
+            }
         }
     }
 
@@ -112,8 +132,12 @@ class CategoryController {
                 message: "Delete permanent category successfully",
                 data: result,
             });
-        } catch (error) {
-            next(error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                next(new Error("An unknown error occurred"));
+            }
         }
     }
 
@@ -126,8 +150,12 @@ class CategoryController {
                 message: "Activated category successfully",
                 data: result,
             });
-        } catch (error) {
-            next(error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                next(new Error("An unknown error occurred"));
+            }
         }
     }
 }

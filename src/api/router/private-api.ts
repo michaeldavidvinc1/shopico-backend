@@ -27,6 +27,7 @@ privateApi.post("/product/create", authenticate, checkRole('SELLER'), upload.arr
 privateApi.get("/product/:slugStore", authenticate, checkRole('SELLER'), ProductController.getAllByStore);
 privateApi.put("/product/:slug", authenticate, checkRole('SELLER'), upload.array('image'), ProductController.update);
 privateApi.delete("/product/:slug", authenticate, checkRole('SELLER'), ProductController.forceDelete);
+privateApi.get("/product/:slug/get-single", authenticate, checkRole('SELLER'), ProductController.getSingleProduct)
 
 privateApi.get("/verify/store/:storeSlug", authenticate, checkRole('SELLER'), StoreController.checkStore)
 privateApi.get("/store/list/:id", authenticate, checkRole('SELLER'), StoreController.getStoreByUser);

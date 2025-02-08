@@ -11,7 +11,6 @@ import { ProductService } from "../service/product-service";
 export class ProductController {
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(req.files);
 
       const request = {
         storeId: req.body.storeId,
@@ -25,7 +24,6 @@ export class ProductController {
         image: [] as string[],
       } as CreateProduct;
 
-      // Upload file ke Cloudinary dan simpan URL-nya
       if (req.files && Array.isArray(req.files)) {
         for (const file of req.files) {
           const filePath = file.path;

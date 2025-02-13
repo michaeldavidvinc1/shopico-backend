@@ -18,4 +18,21 @@ export class SellerController {
       }
     }
   }
+  
+  static async getDataHomePage(req: Request, res: Response, next: NextFunction){
+    try {
+      const result = await SellerService.getDataHomePage();
+      res.status(200).json({
+        success: true,
+        message: "Get all data successfully",
+        data: result,
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error);
+      } else {
+        next(new Error("An unknown error occurred"));
+      }
+    }
+  }
 }

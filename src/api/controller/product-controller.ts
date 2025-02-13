@@ -106,7 +106,7 @@ export class ProductController {
       ? JSON.parse(req.body.current_images)
       : [];
       request.image = currentImages.concat(imageUrls);
-
+      console.log(request)
       const result = await ProductService.update(request, productSlug);
       res.status(200).json({
         success: true,

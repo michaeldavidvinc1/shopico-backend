@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  react-app:
+    image: node:20.12
+    container_name: shopico-backend
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - .env.local:/app/.env.local
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env.local
+    command: ["sh", "-c", "npm ci && npm run dev"]

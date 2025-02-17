@@ -77,10 +77,9 @@ export class CategoryService {
     if (searchCategory.name) {
       filters.name = { contains: searchCategory.name };
     }
-    filters.status = {
-      equals:
-        searchCategory.status !== undefined ? searchCategory.status : true,
-    };
+    if (searchCategory.status) {
+      filters.status = {contains: searchCategory.status};
+    }
 
     const categories = await prismaClient.category.findMany({
       where: { ...filters },

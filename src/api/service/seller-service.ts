@@ -16,6 +16,9 @@ export class SellerService {
         const category = await prismaClient.category.findMany({
             where: {
                 status: Status.ACTIVE
+            },
+            include: {
+                image: true
             }
         })
 

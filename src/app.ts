@@ -5,6 +5,7 @@ import errorHandlerMiddleware from "./middleware/handle-error";
 import config from "./config";
 import {publicApi} from "./api/router/public-api";
 import { privateApi } from "./api/router/private-api";
+import { setupSwagger } from "./swagger";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+setupSwagger(app);
 app.use('/api/v1', publicApi);
 app.use('/api/v1', privateApi);
 

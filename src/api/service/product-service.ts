@@ -82,7 +82,7 @@ export class ProductService {
 
         if (searchProduct.name) {
             filters.name = {contains: searchProduct.name};
-    }
+        }
 
         if (searchProduct.status) {
             filters.status = {contains: searchProduct.status};

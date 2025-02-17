@@ -9,7 +9,99 @@ import { SellerController } from "../controller/seller-controller";
 export const privateApi = express.Router();
 
 // API ADMIN
+/**
+ * @swagger
+ * tags:
+ *   - name: Admin
+ * security:
+ *   - bearerAuth: []
+ *
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ * 
+ * /api/v1/admin/category/create:
+ *   post:
+ *     tags:
+ *       - Admin   
+ *     description: Create Category
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: string
+ *               slug:
+ *                 type: string
+ *                 example: string
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 example: file
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 privateApi.post("/admin/category/create", authenticate, checkRole('ADMIN'), upload.single('image'), CategoryController.create);
+/**
+ * @swagger
+ * tags:
+ *   - name: Admin
+ * 
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ * 
+ * security:
+ *   - bearerAuth: []
+ *
+ * /api/v1/admin/category:
+ *   get:
+ *     tags:
+ *       - Admin   
+ *     description: Get all Categories
+ *     parameters:
+ *       - name: name
+ *         in: header
+ *         required: false
+ *         schema:
+ *           type: string
+ *           description: "name"
+ *       - name: status
+ *         in: header
+ *         required: false
+ *         schema:
+ *           type: string
+ *           description: "active"
+ *       - name: page
+ *         in: header
+ *         required: false
+ *         schema:
+ *           type: number
+ *           example: 1
+ *       - name: size
+ *         in: header
+ *         required: false
+ *         schema:
+ *           type: number
+ *           example: 10
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+
 privateApi.get("/admin/category", authenticate, checkRole('ADMIN') ,CategoryController.getAll);
 privateApi.get("/admin/category/:slug", authenticate, checkRole('ADMIN'),  CategoryController.getSingle);
 privateApi.put("/admin/category/:slug", authenticate, checkRole('ADMIN'), upload.single('image'), CategoryController.update);

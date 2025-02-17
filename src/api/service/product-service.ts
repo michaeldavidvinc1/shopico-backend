@@ -189,20 +189,4 @@ export class ProductService {
 
         return product;
     }
-
-    static async activatedProduct(slug: string): Promise<ApiProduct> {
-
-        await this.checkProduct(slug);
-
-        const product = await prismaClient.product.update({
-            where: {
-                slug: slug
-            },
-            data: {
-                status: Status.ACTIVE
-            }
-        })
-
-        return await this.checkProduct(product.slug);
-    }
 }

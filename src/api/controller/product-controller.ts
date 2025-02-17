@@ -4,7 +4,6 @@ import fs from "fs";
 import {
   CreateProduct,
   SearchProduct,
-  UpdateProduct,
 } from "../../model/request/product-request";
 import { ProductService } from "../service/product-service";
 
@@ -129,28 +128,6 @@ export class ProductController {
       res.status(200).json({
         success: true,
         message: "Delete permanent product successfully",
-        data: result,
-      });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        next(error);
-      } else {
-        next(new Error("An unknown error occurred"));
-      }
-    }
-  }
-
-  static async activationProduct(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const productSlug = req.params.slug;
-      const result = await ProductService.activatedProduct(productSlug);
-      res.status(200).json({
-        success: true,
-        message: "Activation product successfully",
         data: result,
       });
     } catch (error: unknown) {

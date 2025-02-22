@@ -16,6 +16,6 @@ export class CategoryValidation {
     name: z.string().min(1).optional(),
     slug: z.string().min(1).optional(),
     image: z.string().nullable().optional(),
-    status: z.string()
+    deleteImage: z.string().optional(),
   });
 }

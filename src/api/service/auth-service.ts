@@ -15,6 +15,8 @@ import { createJWT } from "../../utils/jwt";
 import { AuthValidation } from "../../validation/auth-validation";
 import { Role } from "@prisma/client";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import config from "../../config";
 
 export class AuthService {
   static async register(req: RegisterRequest): Promise<AuthResponse> {
@@ -123,5 +125,10 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  static async verifyToken(token: string) {
+      const decoded = jwt.verify(token, config.jwtSecret as string);
+      return decoded;
   }
 }

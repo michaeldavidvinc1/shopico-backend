@@ -56,4 +56,31 @@ export class AuthController {
             }
         }
     }
+
+    static async verifyToken(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const token = req.params.token;
+            const result = await AuthService.verifyToken(token);
+
+            res.status(200).json({
+                success: true,
+                message: "Token verified successfully",
+                data: result,
+            });
+        } catch (error) {
+            if (error instanceof Error) {
+                if (error.name === "TokenExpiredError") {
+                    res.status(401).json({
+                        success: false,
+                        message: "Token has expired, please login again.",
+                        data: true,
+                    });
+                }
+                return next(error); // Make sure to return this
+            }
+            next(new Error("An unknown error occurred"));
+        }
+    }
+
+
 }

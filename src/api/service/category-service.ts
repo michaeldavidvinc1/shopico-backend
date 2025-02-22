@@ -17,7 +17,9 @@ import { ExtractPublicId } from "../../helpers/extractPubliId";
 import { Status } from "@prisma/client";
 
 export class CategoryService {
-  static async checkCategoryMustExists(categorySlug: string): Promise<ApiCategory> {
+  static async checkCategoryMustExists(
+    categorySlug: string
+  ): Promise<ApiCategory> {
     const category = await prismaClient.category.findFirst({
       where: {
         slug: categorySlug,
@@ -78,7 +80,7 @@ export class CategoryService {
       filters.name = { contains: searchCategory.name };
     }
     if (searchCategory.status) {
-      filters.status = {contains: searchCategory.status};
+      filters.status = { contains: searchCategory.status };
     }
 
     const categories = await prismaClient.category.findMany({
@@ -121,7 +123,10 @@ export class CategoryService {
     return toCategoryResponse(category);
   }
 
-  static async update(req: UpdateCategory,categorySlug: string): Promise<ApiCategory> {
+  static async update(
+    req: UpdateCategory,
+    categorySlug: string
+  ): Promise<ApiCategory> {
     const { image, ...updateCategory } = Validation.validate(
       CategoryValidation.UPDATE,
       req
@@ -130,36 +135,35 @@ export class CategoryService {
     const existingData = await this.checkCategoryMustExists(categorySlug);
 
     const existingImage = await prismaClient.image.findFirst({
-      where: {
-        categoryId: existingData.id,
-      },
+      where: { categoryId: existingData.id },
     });
-    if (image) {
+    console.log("existingImage", existingImage);
+    console.log("existingData", existingData);
+    // Hapus gambar jika deleteImage === 'true'
+    console.log(updateCategory);
+    if (updateCategory.deleteImage === "true" && existingImage) {
+      const publicId = ExtractPublicId(existingImage.url);
+      await cloudinary.uploader.destroy(publicId);
+      await prismaClient.image.delete({
+        where: { categoryId: existingData.id },
+      });
+    }
+
+    if (image && updateCategory.deleteImage !== "true") {
       if (existingImage) {
-        // Delete previous image in cloudinary
         const publicId = ExtractPublicId(existingImage.url);
         await cloudinary.uploader.destroy(publicId);
-        // Update new image url in model Image
-        const data = await prismaClient.image.update({
-          where: {
-            categoryId: existingData.id,
-          },
-          data: {
-            url: image,
-          },
-        });
       }
+      await prismaClient.image.upsert({
+        where: { categoryId: existingData.id },
+        update: { url: image },
+        create: { categoryId: existingData.id, url: image, type: "category" },
+      });
     }
 
     const category = await prismaClient.category.update({
-      where: {
-        slug: categorySlug,
-      },
-      data: {
-        name: updateCategory.name,
-        slug: updateCategory.slug,
-        status: updateCategory.status as Status,
-      },
+      where: { slug: categorySlug },
+      data: { name: updateCategory.name, slug: updateCategory.slug },
     });
 
     return await this.checkCategoryMustExists(category.slug);

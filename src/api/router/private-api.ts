@@ -5,6 +5,7 @@ import { authenticate, checkRole } from "../../middleware/auth";
 import { StoreController } from "../controller/store-controller";
 import {ProductController} from "../controller/product-controller";
 import { SellerController } from "../controller/seller-controller";
+import {AuthController} from "../controller/auth-controller";
 
 export const privateApi = express.Router();
 
@@ -319,6 +320,37 @@ privateApi.get("/admin/category/:slug/activated", authenticate, checkRole('ADMIN
  *         description: OK
  */
 privateApi.post("/store/create", authenticate, StoreController.create);
+/**
+ * @swagger
+ * tags:
+ *   - name: Seller & Customer
+ *
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *
+ * security:
+ *   - bearerAuth: []
+ *
+ * /api/v1/verify/token/{token}:
+ *   get:
+ *     tags:
+ *       - Seller & Customer
+ *     description: Verify token auth
+ *     parameters:
+ *       - name: token
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+privateApi.get("/verify/token/:token", AuthController.verifyToken)
 
 // API SELLER
 /**
@@ -648,3 +680,4 @@ privateApi.get("/store/list/:id", authenticate, checkRole('SELLER'), StoreContro
  *         description: OK
  */
 privateApi.get("/get-all/category", authenticate, checkRole('SELLER'), SellerController.getAllCategory);
+

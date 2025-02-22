@@ -15,5 +15,5 @@ export type UpdateCategory = {
     name: string;
     slug: string;
     image: string | null;
-    status: string;
+    deleteImage: string | null;
 }

@@ -105,24 +105,6 @@ class CategoryController {
         }
     }
 
-    static async softDelete(req: Request, res: Response, next: NextFunction) {
-        try {
-            const categorySlug = req.params.slug;
-            const result = await CategoryService.softDelete(categorySlug);
-            res.status(200).json({
-                success: true,
-                message: "Delete category successfully",
-                data: result,
-            });
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                next(error);
-            } else {
-                next(new Error("An unknown error occurred"));
-            }
-        }
-    }
-
     static async forceDelete(req: Request, res: Response, next: NextFunction) {
         try {
             const categorySlug = req.params.slug;
@@ -141,13 +123,13 @@ class CategoryController {
         }
     }
 
-    static async activatedCategory(req: Request, res: Response, next: NextFunction) {
+    static async changeStatus(req: Request, res: Response, next: NextFunction) {
         try {
             const categorySlug = req.params.slug;
-            const result = await CategoryService.activatedCategory(categorySlug);
+            const result = await CategoryService.changeStatus(categorySlug);
             res.status(200).json({
                 success: true,
-                message: "Activated category successfully",
+                message: "Change status category successfully",
                 data: result,
             });
         } catch (error: unknown) {

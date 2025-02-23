@@ -198,39 +198,8 @@ privateApi.put("/admin/category/:slug", authenticate, checkRole('ADMIN'), upload
  * security:
  *   - bearerAuth: []
  *
- * /api/v1/admin/category/{slug}/softDelete:
- *   get:
- *     tags:
- *       - Admin
- *     description: Soft delete Categories
- *     parameters:
- *       - name: slug
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: OK
- */
-privateApi.get("/admin/category/:slug/softDelete", authenticate, checkRole('ADMIN'),  CategoryController.softDelete);
-/**
- * @swagger
- * tags:
- *   - name: Admin
- *
- * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- *
- * security:
- *   - bearerAuth: []
- *
  * /api/v1/admin/category/{slug}/forceDelete:
- *   get:
+ *   delete:
  *     tags:
  *       - Admin
  *     description: Force delete Categories
@@ -244,7 +213,7 @@ privateApi.get("/admin/category/:slug/softDelete", authenticate, checkRole('ADMI
  *       200:
  *         description: OK
  */
-privateApi.get("/admin/category/:slug/forceDelete", authenticate, checkRole('ADMIN'),  CategoryController.forceDelete);
+privateApi.delete("/admin/category/:slug/forceDelete", authenticate, checkRole('ADMIN'),  CategoryController.forceDelete);
 /**
  * @swagger
  * tags:
@@ -260,8 +229,8 @@ privateApi.get("/admin/category/:slug/forceDelete", authenticate, checkRole('ADM
  * security:
  *   - bearerAuth: []
  *
- * /api/v1/admin/category/{slug}/activated:
- *   get:
+ * /api/v1/admin/category/{slug}/change-status:
+ *   patch:
  *     tags:
  *       - Admin
  *     description: Activated Categories
@@ -275,7 +244,7 @@ privateApi.get("/admin/category/:slug/forceDelete", authenticate, checkRole('ADM
  *       200:
  *         description: OK
  */
-privateApi.get("/admin/category/:slug/activated", authenticate, checkRole('ADMIN'),  CategoryController.activatedCategory);
+privateApi.patch("/admin/category/:slug/change-status", authenticate, checkRole('ADMIN'),  CategoryController.changeStatus);
 
 // API CUSTOMER AND SELLER
 /**

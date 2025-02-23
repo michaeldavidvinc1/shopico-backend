@@ -140,7 +140,6 @@ export class CategoryService {
     console.log("existingImage", existingImage);
     console.log("existingData", existingData);
     // Hapus gambar jika deleteImage === 'true'
-    console.log(updateCategory);
     if (updateCategory.deleteImage === "true" && existingImage) {
       const publicId = ExtractPublicId(existingImage.url);
       await cloudinary.uploader.destroy(publicId);
@@ -169,42 +168,40 @@ export class CategoryService {
     return await this.checkCategoryMustExists(category.slug);
   }
 
-  static async softDelete(slug: string): Promise<ApiCategory> {
-    await this.checkCategoryMustExists(slug);
-
-    const category = await prismaClient.category.update({
-      where: {
-        slug: slug,
-      },
-      data: {
-        status: Status.INACTIVE,
-      },
-    });
-
-    return await this.checkCategoryMustExists(category.slug);
-  }
 
   static async forceDelete(slug: string): Promise<ApiCategory> {
-    await this.checkCategoryMustExists(slug);
+    const category = await this.checkCategoryMustExists(slug);
 
-    const category = await prismaClient.category.delete({
+    const existingImage = await prismaClient.image.findFirst({
+      where: { categoryId: category.id },
+    });
+
+    if (existingImage) {
+      const publicId = ExtractPublicId(existingImage.url);
+      await cloudinary.uploader.destroy(publicId);
+      await prismaClient.image.delete({
+        where: { categoryId: category.id },
+      });
+    }
+    
+    const dataCategory = await prismaClient.category.delete({
       where: {
         slug: slug,
       },
     });
 
-    return await this.checkCategoryMustExists(category.slug);
+    return dataCategory;
   }
 
-  static async activatedCategory(slug: string): Promise<ApiCategory> {
-    await this.checkCategoryMustExists(slug);
+  static async changeStatus(slug: string): Promise<ApiCategory> {
+    const data = await this.checkCategoryMustExists(slug);
 
     const category = await prismaClient.category.update({
       where: {
         slug: slug,
       },
       data: {
-        status: Status.ACTIVE,
+        status: data.status === Status.ACTIVE ? Status.INACTIVE : Status.ACTIVE
       },
     });
 

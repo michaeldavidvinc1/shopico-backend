@@ -75,25 +75,25 @@ privateApi.post("/admin/category/create", authenticate, checkRole('ADMIN'), uplo
  *     description: Get all Categories
  *     parameters:
  *       - name: name
- *         in: header
+ *         in: query
  *         required: false
  *         schema:
  *           type: string
  *           description: "name"
  *       - name: status
- *         in: header
+ *         in: query
  *         required: false
  *         schema:
  *           type: string
  *           description: "active"
  *       - name: page
- *         in: header
+ *         in: query
  *         required: false
  *         schema:
  *           type: number
  *           example: 1
  *       - name: size
- *         in: header
+ *         in: query
  *         required: false
  *         schema:
  *           type: number

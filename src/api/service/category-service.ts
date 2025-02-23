@@ -80,9 +80,8 @@ export class CategoryService {
       filters.name = { contains: searchCategory.name };
     }
     if (searchCategory.status) {
-      filters.status = { contains: searchCategory.status };
+      filters.status = { equals: searchCategory.status };
     }
-
     const categories = await prismaClient.category.findMany({
       where: { ...filters },
       include: {
@@ -168,7 +167,6 @@ export class CategoryService {
     return await this.checkCategoryMustExists(category.slug);
   }
 
-
   static async forceDelete(slug: string): Promise<ApiCategory> {
     const category = await this.checkCategoryMustExists(slug);
 
@@ -183,7 +181,7 @@ export class CategoryService {
         where: { categoryId: category.id },
       });
     }
-    
+
     const dataCategory = await prismaClient.category.delete({
       where: {
         slug: slug,
@@ -201,7 +199,7 @@ export class CategoryService {
         slug: slug,
       },
       data: {
-        status: data.status === Status.ACTIVE ? Status.INACTIVE : Status.ACTIVE
+        status: data.status === Status.ACTIVE ? Status.INACTIVE : Status.ACTIVE,
       },
     });
 

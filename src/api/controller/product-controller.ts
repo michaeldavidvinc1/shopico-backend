@@ -10,7 +10,6 @@ import { ProductService } from "../service/product-service";
 export class ProductController {
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-
       const request = {
         storeId: req.body.storeId,
         categoryId: req.body.categoryId,
@@ -35,7 +34,6 @@ export class ProductController {
         }
       }
 
-
       const result = await ProductService.create(request);
       res.status(200).json({
         success: true,
@@ -56,7 +54,7 @@ export class ProductController {
       const slugStore = req.params.slugStore;
       const request: SearchProduct = {
         name: (req.query.name as string) || "",
-        status: (req.query.name as string) || "",
+        status: (req.query.status as string) || "",
         page: req.query.page ? Number(req.query.page) : 1,
         size: req.query.size ? Number(req.query.size) : 10,
       };
@@ -87,7 +85,8 @@ export class ProductController {
         stock: Number(req.body.stock),
         price: Number(req.body.price),
         weight: req.body.weight ? Number(req.body.weight) : null,
-        image: [] as string[],
+        image: [],
+        delete_image: req.body.delete_image,
       };
       const imageUrls: string[] = [];
       if (req.files && Array.isArray(req.files)) {
@@ -102,10 +101,9 @@ export class ProductController {
         }
       }
       const currentImages = req.body.current_images
-      ? JSON.parse(req.body.current_images)
-      : [];
+        ? JSON.parse(req.body.current_images)
+        : [];
       request.image = currentImages.concat(imageUrls);
-      console.log(request)
       const result = await ProductService.update(request, productSlug);
       res.status(200).json({
         success: true,

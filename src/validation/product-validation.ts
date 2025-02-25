@@ -24,6 +24,7 @@ export class ProductValidation {
         name: z.string().min(1).optional(),
         slug: z.string().min(1).optional(),
         image: z.string().array().optional(),
+        delete_image: z.string().array().optional(),
         description: z.string().optional(),
         stock: z.number().optional(),
         price: z.number().optional(),

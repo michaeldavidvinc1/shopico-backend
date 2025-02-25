@@ -23,6 +23,7 @@ export type UpdateProduct = {
     name: string;
     slug: string;
     image: string[];
+    delete_image: string[];
     description: string | null;
     stock: number;
     price: number;

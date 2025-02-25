@@ -6,12 +6,15 @@ import config from "./config";
 import {publicApi} from "./api/router/public-api";
 import { privateApi } from "./api/router/private-api";
 import { setupSwagger } from "./swagger";
+process.env.TZ = "Asia/Jakarta";
 
 const app = express();
 
+console.log("Waktu sekarang:", new Date().toLocaleString());
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: ["http://localhost:5173", "http://localhost:3000", "http://localhost:3001"],
     credentials: true,
   })
 );

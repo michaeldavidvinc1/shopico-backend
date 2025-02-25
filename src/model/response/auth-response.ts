@@ -6,6 +6,7 @@ export type AuthResponse = {
   email: string;
   role: string;
   token?: string;
+  exp?: number;
 };
 
 export function toAuthResponse(user: User): AuthResponse {

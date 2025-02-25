@@ -6,7 +6,7 @@ class Unauthorized extends CustomAPIError {
     statusCode: number;
     constructor(message: string) {
         super(message);
-        this.statusCode = StatusCodes.FORBIDDEN;
+        this.statusCode = StatusCodes.UNAUTHORIZED;
     }
 }
 

@@ -76,7 +76,8 @@ export class AuthService {
     const response = toAuthResponse(user);
     return {
       ...response,
-      token: token,
+      token: token.token,
+      exp: token.exp,
       id: user.id
     };
   }
@@ -108,7 +109,8 @@ export class AuthService {
     const response = toAuthResponse(user);
     return {
       ...response,
-      token: token,
+      token: token.token,
+      exp: token.exp,
       id: user.id
     };
   }

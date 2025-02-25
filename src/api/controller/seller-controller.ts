@@ -21,7 +21,8 @@ export class SellerController {
   
   static async getDataHomePage(req: Request, res: Response, next: NextFunction){
     try {
-      const result = await SellerService.getDataHomePage();
+      const userId = req.params.userId || "";
+      const result = await SellerService.getDataHomePage(userId);
       res.status(200).json({
         success: true,
         message: "Get all data successfully",

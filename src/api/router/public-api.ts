@@ -103,7 +103,13 @@ publicApi.post("/auth/login", AuthController.login);
  * /api/v1/get-data/home:
  *   get:
  *     tags:
- *       - Seller   
+ *       - Seller
+ *     parameters:
+ *       - name: userId
+ *         in: path
+ *         required: false
+ *         schema:
+ *           type: string  
  *     responses:
  *       200:
  *         description: OK

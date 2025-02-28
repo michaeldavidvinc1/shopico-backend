@@ -158,4 +158,44 @@ export class ProductController {
       }
     }
   }
+
+  static async detailProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+      const request = {
+        slug : req.params.slug,
+        userId : req.params.userId || ""
+      }
+      const result = await ProductService.detailProduct(request);
+      res.status(200).json({
+        success: true,
+        message: "Get single product successfully",
+        data: result,
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error);
+      } else {
+        next(new Error("An unknown error occurred"));
+      }
+    }
+  }
+
+  static async getProductByCategory(req: Request, res: Response, next: NextFunction) {
+    try {
+      const categoryId = req.params.slug;
+      const result = await ProductService.getProductByCategory(categoryId);
+      res.status(200).json({
+        success: true,
+        message: "Get product successfully",
+        data: result,
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error);
+      } else {
+        next(new Error("An unknown error occurred"));
+      }
+    }
+  }
+
 }

@@ -205,4 +205,52 @@ export class ProductService {
 
     return product;
   }
+
+  static async detailProduct({ slug, userId }: { slug: string; userId: string }) {
+     const product = await prismaClient.product.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        price: true,
+        stock: true,
+        weight: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        category: {
+          select: { name: true },
+        },
+        Reviews: {
+          select: { rating: true },
+        },
+        Wishlist: userId
+          ? {
+              where: { userId },
+              select: { id: true },
+            }
+          : false,
+      },
+    });
+
+    return product;
+  }
+  
+
+  static async getProductByCategory(categoryId: string): Promise<ApiProduct[]> {
+    const product = await prismaClient.product.findMany({
+      where: { 
+        categoryId: categoryId
+       },
+      include: {
+        category: true,
+        image: true,
+      },
+      take: 10,
+    });
+
+    return product.map((product) => toProductResponse(product))
+  }
 }

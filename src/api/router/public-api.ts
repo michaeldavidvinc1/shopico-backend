@@ -1,6 +1,7 @@
 import express from "express";
 import { AuthController } from "../controller/auth-controller";
 import { SellerController } from "../controller/seller-controller";
+import { ProductController } from "../controller/product-controller";
 
 export const publicApi = express.Router();
 
@@ -115,3 +116,6 @@ publicApi.post("/auth/login", AuthController.login);
  *         description: OK
  */
 publicApi.get("/get-data/home", SellerController.getDataHomePage);
+
+publicApi.get("/detail-product/:slug", ProductController.detailProduct);
+publicApi.get("/product-by-category/:category", ProductController.getProductByCategory);
